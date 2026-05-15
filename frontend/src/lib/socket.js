@@ -1,10 +1,3 @@
-// frontend/src/lib/socket.js
-//
-// Production change: In dev, socket connects to window.location.origin (proxied by Vite).
-// In prod, the backend is a different origin — we must connect to VITE_API_URL explicitly.
-//
-// __API_BASE__ is injected at build time by vite.config.js.
-
 import { io } from 'socket.io-client';
 import { getAccessToken } from './api';
 

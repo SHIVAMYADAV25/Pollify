@@ -3,6 +3,7 @@ import api, { setAccessToken, clearAccessToken } from '../lib/api';
 
 const useAuthStore = create((set) => ({
   user: null,
+  accessToken: null,
   isAuthenticated: false,
   isLoading: true,
 
@@ -11,25 +12,49 @@ const useAuthStore = create((set) => ({
     try {
       const res = await api.post('/auth/refresh');
       setAccessToken(res.data.accessToken);
-      set({ user: res.data.user, isAuthenticated: true, isLoading: false });
+
+      set({
+        user: res.data.user,
+        accessToken: res.data.accessToken,
+        isAuthenticated: true,
+        isLoading: false,
+      });
     } catch {
       // No valid refresh cookie — treat as logged out
       clearAccessToken();
-      set({ user: null, isAuthenticated: false, isLoading: false });
+
+      set({
+        user: null,
+        accessToken: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
     }
   },
 
   login: async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
+
     // Access token stored in memory only — refresh token lives in httpOnly cookie
     setAccessToken(res.data.accessToken);
-    set({ user: res.data.user, isAuthenticated: true });
+
+    set({
+      user: res.data.user,
+      accessToken: res.data.accessToken,
+      isAuthenticated: true,
+    });
   },
 
   register: async (name, email, password) => {
     const res = await api.post('/auth/register', { name, email, password });
+
     setAccessToken(res.data.accessToken);
-    set({ user: res.data.user, isAuthenticated: true });
+
+    set({
+      user: res.data.user,
+      accessToken: res.data.accessToken,
+      isAuthenticated: true,
+    });
   },
 
   logout: async () => {
@@ -38,8 +63,14 @@ const useAuthStore = create((set) => ({
     } catch {
       // Clear locally regardless of server response
     }
+
     clearAccessToken();
-    set({ user: null, isAuthenticated: false });
+
+    set({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+    });
   },
 }));
 

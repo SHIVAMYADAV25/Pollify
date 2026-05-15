@@ -1,6 +1,10 @@
-# Pollify — Real-time Polling Platform
+# Pollify — Real-Time Polling & Feedback Platform
 
-> A production-grade, full-stack polling platform built with the MERN stack and Socket.io for live real-time updates.
+A full-stack real-time polling platform where users can create polls, share public links, collect anonymous or authenticated responses, and analyze live results through interactive dashboards.
+
+Built for the ChaiCode Full Stack Hackathon using the MERN stack.
+
+---
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org)
 [![React](https://img.shields.io/badge/React-18-blue)](https://react.dev)
@@ -9,319 +13,352 @@
 
 ---
 
-## ✨ Features
+# Live Demo
 
-### 🔐 Authentication & Access Control
-- JWT-based authentication with secure httpOnly-style token storage
-- Protected routes for creators (dashboard, analytics, poll management)
-- Optional auth middleware for public poll pages
-- Register / Login with full validation
+## Frontend
 
-### 📊 Poll Creation & Management
-- Create polls with 1–20 questions, each with 2–10 options (single-choice)
-- Mark individual questions as **mandatory** or **optional**
-- Choose between **anonymous** or **authenticated** response mode per poll
-- Set expiry via preset durations (1h / 6h / 24h / 48h / 72h / 7d) or custom datetime
-- Polls auto-expire — no further responses accepted after expiry
+🌐 [Frontend Live URL](YOUR_FRONTEND_URL)
 
-### 📝 Response Collection
-- Public share link — anyone with the link can respond (no account needed for anonymous polls)
-- Authenticated mode enforces login before submission
-- Duplicate prevention: one response per user (auth) / one per IP (anonymous)
-- Real-time countdown timer on the poll form
-- Mandatory/optional validation on both frontend and backend
-- Completion time tracking
+## Backend API
 
-### 📈 Analytics Dashboard
-- Total responses, completion rate, avg. completion time
-- Question-wise summaries: option counts + percentage bars
-- Pie charts per question (Recharts)
-- 7-day participation trend (line chart)
-- Anonymous vs authenticated breakdown
-- Recent submissions feed
-- **Live updates via Socket.io** — analytics refresh automatically when new responses arrive
-
-### 🌐 Result Publishing
-- Creator can manually close an active poll at any time
-- After expiry/close, creator can publish final results in one click
-- Published results are publicly accessible at the same `/poll/:shareCode/results` URL
-- Results page shows full option counts, percentages, winner highlights, and charts
-- Socket.io notifies open poll tabs when results are published
-
-### ⚡ Real-time (WebSocket / Socket.io)
-- Live response count updates on TakePollPage
-- Analytics dashboard auto-refreshes on new responses
-- Poll expiry broadcast to respondents
-- Publish event redirects open poll tabs to results page
-- Creator dashboard updates live response counts
+⚡ [Backend API URL](YOUR_BACKEND_URL)
 
 ---
 
-## 🛠 Tech Stack
+# GitHub Repository
 
-| Layer       | Technology                          |
-|-------------|-------------------------------------|
-| Frontend    | React 18, Vite, Tailwind CSS        |
-| Animations  | Framer Motion                       |
-| Charts      | Recharts                            |
-| State       | Zustand                             |
-| HTTP Client | Axios                               |
-| Backend     | Node.js, Express 4                  |
-| Database    | MongoDB + Mongoose                  |
-| Auth        | JWT (jsonwebtoken) + bcryptjs       |
-| Real-time   | Socket.io v4                        |
-| Validation  | express-validator (backend)         |
-| Security    | helmet, cors, express-rate-limit    |
+📦 [GitHub Repository](YOUR_GITHUB_REPO)
 
 ---
 
-## 📁 Project Structure
+# Features
 
-```
-pollify/                          ← monorepo root
-├── backend/
+## Authentication & Security
+
+* JWT Access + Refresh Token architecture
+* httpOnly secure refresh cookies
+* Refresh token blocklisting
+* Protected routes
+* Persistent login sessions
+* Automatic token refresh
+* Anonymous & authenticated poll modes
+
+---
+
+## Poll System
+
+* Create dynamic polls
+* Single-option questions
+* Mandatory / optional questions
+* Poll expiry system
+* Public share links
+* QR code generation
+* Poll embedding
+* Duplicate poll support
+
+---
+
+## Response Collection
+
+* Anonymous submissions
+* Authenticated submissions
+* Duplicate response prevention
+* IP-based duplicate detection
+* Completion time tracking
+* Atomic MongoDB transactions
+
+---
+
+## Real-Time Features
+
+Powered by Socket.IO
+
+* Live response counts
+* Real-time analytics updates
+* Poll status updates
+* Creator notifications
+* Milestone events
+
+---
+
+## Analytics Dashboard
+
+* Response statistics
+* Participation insights
+* Question-wise summaries
+* Option distribution
+* Completion tracking
+* Public published results
+* CSV export support
+
+---
+
+# Tech Stack
+
+## Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* Framer Motion
+* Zustand
+* Axios
+* Socket.IO
+* Recharts
+
+## Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JWT
+* Zod
+* bcryptjs
+* cookie-parser
+* express-rate-limit
+* helmet
+
+---
+
+# Monorepo Structure
+
+```bash id="u0gx1d"
+pollify/
+├── frontend/
 │   ├── src/
-│   │   ├── config/
-│   │   │   └── db.js             ← MongoDB connection
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── pollController.js ← CRUD, analytics, publish, close
-│   │   │   └── responseController.js
-│   │   ├── middleware/
-│   │   │   ├── auth.js           ← protect + optionalAuth
-│   │   │   └── errorHandler.js
-│   │   ├── models/
-│   │   │   ├── User.js
-│   │   │   ├── Poll.js           ← questions, options, expiry, shareCode
-│   │   │   └── Response.js       ← answers, respondent, IP, timing
-│   │   ├── routes/
-│   │   │   ├── auth.js
-│   │   │   ├── polls.js
-│   │   │   └── responses.js
-│   │   └── server.js             ← Express + Socket.io setup
-│   ├── .env.example
+│   ├── public/
 │   └── package.json
 │
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── common/
-    │   │   │   ├── LoadingSpinner.jsx
-    │   │   │   └── ProtectedRoute.jsx
-    │   │   └── layout/
-    │   │       ├── AuthLayout.jsx
-    │   │       ├── Layout.jsx
-    │   │       └── Navbar.jsx
-    │   ├── lib/
-    │   │   ├── api.js             ← Axios instance with auth interceptor
-    │   │   └── socket.js          ← Socket.io client singleton
-    │   ├── pages/
-    │   │   ├── auth/
-    │   │   │   ├── LoginPage.jsx
-    │   │   │   └── RegisterPage.jsx
-    │   │   ├── analytics/
-    │   │   │   └── AnalyticsPage.jsx  ← Live charts + Socket.io
-    │   │   ├── dashboard/
-    │   │   │   └── DashboardPage.jsx
-    │   │   ├── polls/
-    │   │   │   ├── CreatePollPage.jsx
-    │   │   │   ├── MyPollsPage.jsx
-    │   │   │   └── PollDetailPage.jsx
-    │   │   ├── public/
-    │   │   │   ├── TakePollPage.jsx   ← Public form + live count
-    │   │   │   └── ResultsPage.jsx    ← Published results
-    │   │   ├── HomePage.jsx
-    │   │   └── NotFoundPage.jsx
-    │   ├── store/
-    │   │   └── authStore.js       ← Zustand auth state
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   └── index.css              ← Design system + Tailwind
-    ├── tailwind.config.js
-    ├── vite.config.js
-    └── package.json
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── validators/
+│   └── server.js
+│
+└── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+# Installation
 
-### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
+## Clone Repository
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/pollify.git
+```bash id="qq2o2e"
+git clone YOUR_GITHUB_REPO
 cd pollify
 ```
 
-### 2. Backend setup
+---
 
-```bash
+# Backend Setup
+
+## Navigate to Backend
+
+```bash id="av2kkt"
 cd backend
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
-npm install
-npm run dev
 ```
 
-**Backend `.env`:**
-```env
+## Install Dependencies
+
+```bash id="25hgrg"
+npm install
+```
+
+## Configure Environment Variables
+
+Create `.env`
+
+```env id="dk8m0w"
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/pollify
-JWT_SECRET=your_super_secret_jwt_key_minimum_32_chars
-JWT_EXPIRES_IN=7d
+
+MONGO_URI=YOUR_MONGODB_URI
+
+JWT_SECRET=YOUR_SECRET
+JWT_REFRESH_SECRET=YOUR_REFRESH_SECRET
+
 CLIENT_URL=http://localhost:5173
+
 NODE_ENV=development
 ```
 
-### 3. Frontend setup
+## Start Backend
 
-```bash
-cd frontend
-npm install
+```bash id="6khfdn"
 npm run dev
 ```
 
-The Vite dev server proxies `/api` and `/socket.io` to `http://localhost:5000` automatically.
+Backend runs on:
 
-### 4. Open
-
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000/api/health
-
----
-
-## 🔌 API Reference
-
-### Auth
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/auth/register` | — | Register new user |
-| POST | `/api/auth/login` | — | Login, returns JWT |
-| GET | `/api/auth/me` | ✅ | Get current user |
-
-### Polls (creator)
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/polls` | ✅ | Create poll |
-| GET | `/api/polls/my` | ✅ | List creator's polls |
-| GET | `/api/polls/dashboard` | ✅ | Dashboard stats |
-| GET | `/api/polls/:id` | ✅ | Get poll detail |
-| PATCH | `/api/polls/:id` | ✅ | Update poll |
-| DELETE | `/api/polls/:id` | ✅ | Delete poll |
-| POST | `/api/polls/:id/close` | ✅ | Manually close poll |
-| POST | `/api/polls/:id/publish` | ✅ | Publish results |
-| GET | `/api/polls/:id/analytics` | ✅ | Full analytics |
-
-### Polls (public)
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/polls/share/:shareCode` | Optional | Get poll for responding |
-
-### Responses
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/responses/:shareCode/submit` | Optional | Submit response |
-| GET | `/api/responses/my` | ✅ | My submitted responses |
-
----
-
-## 📡 Socket.io Events
-
-### Client → Server
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `join:poll` | `shareCode` | Join a poll room for updates |
-| `leave:poll` | `shareCode` | Leave poll room |
-| `join:creator` | `userId` | Join creator room for dashboard updates |
-
-### Server → Client
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `response:new` | `{ totalResponses, pollId, shareCode }` | New response submitted |
-| `poll:expired` | `{ pollId, shareCode }` | Poll just expired |
-| `poll:published` | `{ pollId, shareCode }` | Results published |
-
----
-
-## 🗄 Database Schema
-
-### Poll
-```
-title, description, creator (ref: User)
-shareCode (unique, nanoid 10)
-questions[]: { text, isMandatory, options[]: { text, count } }
-isAnonymous, status (active|expired|published)
-expiresAt, totalResponses
-isResultPublished, publishedAt
-settings: { allowMultipleSubmissions, showProgressBar, randomizeQuestions }
-```
-
-### Response
-```
-poll (ref: Poll), respondent (ref: User, nullable)
-isAnonymous, respondentName
-answers[]: { questionId, selectedOptionId }
-ipAddress, userAgent, completionTime
+```txt id="owgmzv"
+http://localhost:5000
 ```
 
 ---
 
-## 🎨 Design System
+# Frontend Setup
 
-- **Primary accent:** `#c0ff2a` (Neon Green)
-- **Secondary accent:** `#ff57c9` (Aurora Pink)
-- **Tertiary:** `#4d9fff` (Electric Blue)
-- **Background:** `#06061a` → `#0d0d28` → `#111130`
-- **Typography:** DM Sans (body) + Plus Jakarta Sans (display) + JetBrains Mono (code)
-- **Components:** Glass morphism cards, animated progress bars, live indicator dots
+## Navigate to Frontend
 
----
+```bash id="9lmxkk"
+cd frontend
+```
 
-## 🏗 Deployment
+## Install Dependencies
 
-### Backend (Render / Railway / Fly.io)
-1. Set all env variables in the platform dashboard
-2. Build command: `npm install`
-3. Start command: `npm start`
+```bash id="j5y6c7"
+npm install
+```
 
-### Frontend (Vercel / Netlify)
-1. Build command: `npm run build`
-2. Output directory: `dist`
-3. Set env var: `VITE_API_URL` if not using proxy in production
+## Configure Environment Variables
 
-> **Note:** In production, update `CLIENT_URL` in backend env and configure CORS accordingly. For Vercel, add a `vercel.json` to proxy `/api` to your backend URL.
+Create `.env`
 
-### `vercel.json` (frontend)
-```json
-{
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "https://your-backend.onrender.com/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
+```env id="7qltkt"
+VITE_API_BASE=http://localhost:5000
+```
+
+## Start Frontend
+
+```bash id="88h0yc"
+npm run dev
+```
+
+Frontend runs on:
+
+```txt id="m1m2u0"
+http://localhost:5173
 ```
 
 ---
 
-## ✅ Hackathon Criteria Coverage
+# API Routes
 
-| Criteria | Implementation |
-|----------|---------------|
-| Authentication & Access Control | JWT auth, protected routes, optional auth middleware |
-| Poll Creation & Question Management | Dynamic form, 1–20 questions, mandatory/optional toggle, 2–10 options |
-| Response Collection Flow | Public form, expiry enforcement, duplicate prevention, mandatory validation |
-| Analytics & Feedback Dashboard | Bar/Pie/Line charts, option counts, participation trends, recent submissions |
-| Frontend Experience | Framer Motion animations, responsive design, live indicators, custom design system |
-| Backend Architecture & API Design | RESTful Express API, proper error handling, rate limiting, helmet security |
-| Real-Time Updates (WebSockets) | Socket.io rooms: poll room + creator room, live counts, publish events |
-| Code Quality & Project Structure | Separated controllers/routes/models/middleware, Zustand state management |
+## Auth Routes
+
+| Method | Endpoint             |
+| ------ | -------------------- |
+| POST   | `/api/auth/register` |
+| POST   | `/api/auth/login`    |
+| POST   | `/api/auth/refresh`  |
+| POST   | `/api/auth/logout`   |
+| GET    | `/api/auth/me`       |
 
 ---
 
-## 📝 License
+## Poll Routes
 
-MIT — built for the Pollify Hackathon.
+| Method | Endpoint                      |
+| ------ | ----------------------------- |
+| POST   | `/api/polls`                  |
+| GET    | `/api/polls/my`               |
+| GET    | `/api/polls/share/:shareCode` |
+| GET    | `/api/polls/:id`              |
+| PATCH  | `/api/polls/:id`              |
+| DELETE | `/api/polls/:id`              |
+| POST   | `/api/polls/:id/publish`      |
+| POST   | `/api/polls/:id/close`        |
+| GET    | `/api/polls/:id/analytics`    |
+| GET    | `/api/polls/:id/export-csv`   |
+
+---
+
+## Response Routes
+
+| Method | Endpoint                           |
+| ------ | ---------------------------------- |
+| POST   | `/api/responses/:shareCode/submit` |
+| GET    | `/api/responses/my`                |
+
+---
+
+# Real-Time Architecture
+
+Socket rooms used:
+
+```txt id="jklc42"
+poll:{shareCode}
+creator:{userId}
+poll:admin:{shareCode}
+```
+
+Real-time events:
+
+* `response:new`
+* `poll:expired`
+* `poll:published`
+* `milestone:reached`
+
+---
+
+# Security Features
+
+* Helmet security headers
+* Secure cookies
+* JWT verification
+* Token revocation
+* Request rate limiting
+* Protected routes
+* Input validation
+* Duplicate response prevention
+
+---
+
+# Production Deployment
+
+## Frontend
+
+Deploy on:
+
+* Vercel
+
+## Backend
+
+Deploy on:
+
+* Railway
+* Render
+
+## Database
+
+Use:
+
+* MongoDB Atlas
+
+---
+
+# Hackathon Highlights
+
+✅ Real-time polling using WebSockets
+✅ JWT authentication with refresh flow
+✅ Atomic MongoDB transactions
+✅ Anonymous + authenticated poll support
+✅ Poll expiry system
+✅ Public result publishing
+✅ Live analytics dashboard
+✅ Optimistic UI updates
+✅ Socket room isolation
+✅ Production-style MERN architecture
+
+---
+
+# Future Improvements
+
+* OAuth login
+* AI-generated poll suggestions
+* Drag-and-drop poll builder
+* Dark mode
+* Multi-language support
+* Push notifications
+* Poll templates
+* Team collaboration
+
+---
+
+# Author
+
+Built by Shivam Yadav for the ChaiCode Full Stack Hackathon 🚀

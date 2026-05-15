@@ -22,6 +22,10 @@ exports.submitResponse = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'This poll requires authentication. Please log in to respond.' });
     }
 
+    // Extract IP once — used for anonymous duplicate checks below and passed to service
+    const rawIp = req.ip || req.connection?.remoteAddress || '';
+    const ip = rawIp.replace('::ffff:', '').replace('::1', '127.0.0.1');
+
     // Duplicate check — authenticated user
     if (req.user && !poll.settings?.allowMultipleSubmissions) {
       const existing = await Response.findOne({ poll: poll._id, respondent: req.user._id });
@@ -32,8 +36,6 @@ exports.submitResponse = async (req, res, next) => {
 
     // Duplicate check — anonymous user by IP
     if (!req.user && !poll.settings?.allowMultipleSubmissions) {
-      const rawIp = req.ip || req.connection?.remoteAddress || '';
-const ip = rawIp.replace('::ffff:', '');
       const existing = await Response.findOne({ poll: poll._id, ipAddress: ip, isAnonymous: true });
       if (existing) {
         return res.status(409).json({ success: false, message: 'A response from your location has already been submitted.' });
@@ -60,9 +62,6 @@ const ip = rawIp.replace('::ffff:', '');
       }
       validatedAnswers.push({ questionId: ans.questionId, selectedOptionId: ans.selectedOptionId });
     }
-
-    const rawIp = req.ip || req.connection?.remoteAddress || '';
-    const ip = rawIp.replace('::ffff:', '');
 
     // Delegate atomic transaction to service layer
     const { updatedPoll, milestone } = await pollService.submitResponse({

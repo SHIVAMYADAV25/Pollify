@@ -7,7 +7,7 @@ import {
 import { format, formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 import api from '../../lib/api';
-import { connectSocket, leavePollRoom ,leaveAdminRoom } from '../../lib/socket';
+import { connectSocket, leavePollRoom } from '../../lib/socket';
 import useAuthStore from '../../store/authStore';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
