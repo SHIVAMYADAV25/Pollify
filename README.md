@@ -17,17 +17,17 @@ Built for the ChaiCode Full Stack Hackathon using the MERN stack.
 
 ## Frontend
 
-🌐 [Frontend Live URL](YOUR_FRONTEND_URL)
+🌐 [Frontend Live URL](https://pollify-iota.vercel.app)
 
 ## Backend API
 
-⚡ [Backend API URL](YOUR_BACKEND_URL)
+⚡ [Backend API URL](https://poll-production.up.railway.app)
 
 ---
 
 # GitHub Repository
 
-📦 [GitHub Repository](YOUR_GITHUB_REPO)
+📦 [GitHub Repository](https://github.com/SHIVAMYADAV25/Poll)
 
 ---
 
